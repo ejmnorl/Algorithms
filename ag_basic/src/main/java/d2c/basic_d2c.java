@@ -390,3 +390,122 @@ public class basic_d2c {
         return new RET(true, Math.max(l.height, r.height) + 1);
     }
 }
+
+/*
+chap1
+https://www.lintcode.com/problem/classical-binary-search/description
+
+https://www.lintcode.com/problem/first-position-of-target/description
+
+https://www.lintcode.com/problem/last-position-of-target/description
+
+https://www.lintcode.com/problem/first-bad-version/description
+
+https://www.lintcode.com/problem/search-in-a-big-sorted-array/description
+
+https://www.lintcode.com/problem/find-minimum-in-rotated-sorted-array/description
+
+https://www.lintcode.com/problem/smallest-rectangle-enclosing-black-pixels/description
+
+
+prac:
+https://www.lintcode.com/problem/search-a-2d-matrix/
+https://www.lintcode.com/problem/search-a-2d-matrix-ii/
+
+https://www.lintcode.com/problem/search-for-a-range/
+https://www.lintcode.com/problem/total-occurrence-of-target/
+
+https://www.lintcode.com/en/problem/maximum-number-in-mountain-sequence/
+
+
+chap2
+
+Traverse a Binary Tree
+  • Preorder:
+ http://www.lintcode.com/problem/binary-tree-preorder-traversal/  http://www.jiuzhang.com/solutions/binary-tree-preorder-traversal/
+• Inorder
+ http://www.lintcode.com/en/problem/binary-tree-inorder-traversal/ • http://www.jiuzhang.com/solutions/binary-tree-inorder-traversal/
+• Postorder:
+ http://www.lintcode.com/en/problem/binary-tree-postorder-traversal/ • http://www.jiuzhang.com/solutions/binary-tree-postorder-traversal/
+
+  Maximum Depth of Binary Tree
+http://www.lintcode.com/problem/maximum-depth-of-binary-tree/
+http://www.jiuzhang.com/solutions/maximum-depth-of-binary-tree/
+
+
+Divide Conquer vs Traverse
+  令狐大师兄手把手
+  http://www.lintcode.com/en/problem/binary-tree-paths/
+http://www.jiuzhang.com/solutions/binary-tree-paths/
+
+ Minimum Subtree
+http://www.lintcode.com/en/problem/minimum-subtree/
+http://www.jiuzhang.com/solutions/minimum-subtree/
+Traverse + Divide Conquer 课后作业:只用 Divide Conquer 来实现
+
+BREAK
+
+ Result Type class ResultType { int var1, var2; }
+
+  Balanced Binary Tree
+http://www.lintcode.com/problem/balanced-binary-tree/
+http://www.jiuzhang.com/solutions/balanced-binary-tree/
+
+When we need ResultType?
+  Subtree with Maximum Average
+http://www.lintcode.com/problem/subtree-with-maximum-average/
+http://www.jiuzhang.com/solutions/subtree-with-maximum-average/
+  Flattern Binary Tree to Linked List
+http://www.lintcode.com/problem/flatten-binary-tree-to-linked-list/
+http://www.jiuzhang.com/solutions/flatten-binary-tree-to-linked-list/
+
+  Lowest Common Ancestor
+http://www.lintcode.com/problem/lowest-common-ancestor/
+http://www.jiuzhang.com/solutions/lowest-common-ancestor/
+with parent pointer vs no parent pointer follow up: LCA II & III
+
+ Binary Tree Longest Consecutive Sequence
+http://www.lintcode.com/problem/binary-tree-longest-consecutive-
+sequence/
+http://www.jiuzhang.com/solutions/binary-tree-longest-consecutive -sequence/
+follow up: BT LCS II & III
+
+
+  Binary Tree Path Sum I && II && III
+http://www.lintcode.com/problem/binary-tree-path-sum/
+http://www.lintcode.com/problem/binary-tree-path-sum-ii/ http://www.lintcode.com/problem/binary-tree-path-sum-iii/
+
+
+#######
+
+ Binary Search Tree 二叉查找树，简称“BST” 又名“二叉搜索树”“排序二叉树”
+  Validate Binary Search Tree
+http://www.lintcode.com/problem/validate-binary-search-tree/
+http://www.jiuzhang.com/solutions/validate-binary-search-tree/
+traverse vs divide conquer
+
+  Convert Binary Search Tree to Doubly Linked List
+http://www.lintcode.com/problem/convert-binary-search-tree-to-do
+ubly-linked-list/
+http://www.jiuzhang.com/solutions/convert-binary-search-tree-to-d oubly-linked-list/
+
+   Related Questions
+
+    • Binary Search Tree Iterator
+• http://www.lintcode.com/problem/binary-search-tree-iterator
+• http://www.jiuzhang.com/solutions/binary-search-tree-iterator • In-order Successor in Binary Search Tree
+• http://www.lintcode.com/problem/inorder-successor-in-binary-search-tree/ • http://www.jiuzhang.com/solutions/inorder-successor-in-binary-search-tree/ • Search Range in Binary Search Tree
+• http://www.lintcode.com/problem/search-range-in-binary-search-tree/
+• Insert Node in a Binary Search Tree
+• http://www.lintcode.com/problem/insert-node-in-a-binary-search-tree/
+• Remove Node in a Binary Search Tree
+• http://www.lintcode.com/problem/remove-node-in-binary-search-tree/
+• http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete.html 禁止录像与传播录像，否则将追究法律责任和经济赔偿
+
+ 点题时间 http://www.jiuzhang.com/qa/983/
+
+
+
+
+
+ */
