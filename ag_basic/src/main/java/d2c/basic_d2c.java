@@ -1,6 +1,8 @@
 package d2c;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class basic_d2c {
@@ -389,7 +391,687 @@ public class basic_d2c {
         }
         return new RET(true, Math.max(l.height, r.height) + 1);
     }
+
+    /*
+http://www.lintcode.com/problem/subtree-with-maximum-average/
+Subtree with Maximum Average
+Given a binary tree, find the subtree with maximum average.
+Return the root of the subtree.
+ */
+    private class RET {
+        int sum;
+        int num;
+        double globalMax;
+        TreeNode globalMaxNode;
+
+        public RET() {
+            this.sum = 0;
+            this.num = 0;
+            this.globalMax = -Double.MAX_VALUE;
+            this.globalMaxNode = null;
+        }
+    }
+
+    public TreeNode findSubtree2(TreeNode root) {
+        // write your code here
+        if (root == null || (root.left == null && root.right == null)) {
+            return root;
+        }
+        return core(root).globalMaxNode;
+
+    }
+    private RET core(TreeNode cur) {
+        if (cur == null) {
+            return new RET();
+        }
+        RET ret = new RET();
+        RET l = core(cur.left);
+        RET r = core(cur.right);
+
+        ret.sum = l.sum + r.sum + cur.val;
+        ret.num = l.num + r.num + 1;
+
+        double avg = (double) ret.sum / ret.num;
+        RET toCmp = l.globalMax > r.globalMax ? l : r;
+//        System.out.println("TOCMPT : sum" + toCmp.sum + " #: " + toCmp.num + " ~~CUR~~ " + cur.val + "CUR AVG: " + avg);
+
+        if (avg > toCmp.globalMax) {
+            ret.globalMax = avg;
+            ret.globalMaxNode = cur;
+        } else {
+            ret.globalMax = toCmp.globalMax;
+            ret.globalMaxNode = toCmp.globalMaxNode;
+        }
+        return ret;
+    }
+
+    /* TODO: interative method (tranverse)
+    https://www.lintcode.com/problem/flatten-binary-tree-to-linked-list/description
+    Flatten Binary Tree to Linked List
+    Flatten a binary tree to a fake "linked list" in pre-order traversal.
+    Here we use the right pointer in TreeNode as the next pointer in ListNode.
+     */
+
+    private class RET {
+        TreeNode head;
+        TreeNode tail;
+
+        public RET(TreeNode head, TreeNode tail) {
+            this.head = head;
+            this.tail = tail;
+        }
+
+        public RET() {}
+    }
+    public void flatten(TreeNode root) {
+        // write your code here
+        if (root == null || (root.left == null && root.right == null)) {
+            return;
+        }
+        core(root);
+    }
+
+    private RET core(TreeNode cur) {
+        if (cur == null) {
+            return null;
+        }
+        if (cur.left == null && cur.right == null) {
+            return new RET(cur, cur);
+        }
+
+        RET l = core(cur.left);
+        RET r = core(cur.right);
+        cur.left = null;
+        cur.right = null;
+        TreeNode tail = null;
+        if (l != null) {
+            cur.right = l.head;
+            tail = l.tail;
+            if (r != null) {
+                l.tail.right = r.head;
+                tail = r.tail;
+            }
+        } else { // l == null
+            if (r != null) {
+                cur.right = r.head;
+                tail = r.tail;
+            } else {//l == null, r == null
+                tail = cur;
+            }
+        }
+        return new RET(cur, tail);
+    }
+
+    /*
+    https://www.lintcode.com/problem/lowest-common-ancestor/
+     Lowest Common Ancestor of a Binary Tree
+
+    Given the root and two nodes in a Binary Tree.
+    Find the lowest common ancestor(LCA) of the two nodes.
+
+    The lowest common ancestor is the node with largest depth
+    which is the ancestor of both nodes.
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode A, TreeNode B) {
+        // write your code here
+        if (root == null || A == null || B == null) {
+            return null;
+        }
+        return core(root, A, B);
+    }
+
+    private TreeNode core(TreeNode cur, TreeNode A, TreeNode B) {
+        if (cur == null) {
+            return null;
+        }
+        TreeNode ret = null;
+        if (cur == A || cur == B) {
+            ret = cur;
+        }
+        TreeNode l = core(cur.left, A, B);
+        TreeNode r = core(cur.right, A, B);
+        if (l != null && r != null) {
+            return cur;
+        }
+
+        if (l == null && r != null) {
+            ret = (ret == null ? r : cur);
+        } else if (l != null && r == null) {
+            ret = (ret == null ? l : cur);
+        }
+        return ret;
+    }
+
+    /*
+    http://www.lintcode.com/problem/binary-tree-longest-consecutive-
+sequence/
+    Binary Tree Longest Consecutive Sequence
+    Given a binary tree, find the length of the longest consecutive sequence path.
+
+    The path refers to any sequence of nodes from some starting node
+    to any node in the tree along the parent-child connections.
+    The longest consecutive path need to be from parent to child
+    (cannot be the reverse).
+
+     */
+
+    private int globalInc = 1;
+    private int globalDec = 1;
+
+    public int longestConsecutive(TreeNode root) {
+        // write your code here
+        if (root == null) {
+            return 0;
+        }
+        core(root, root.val - 1, 0, 0);
+        return Math.max(globalDec, globalInc);
+    }
+
+    private void core(TreeNode cur, int parentVal, int incLen, int decLen) {
+        if (cur == null) {
+            return;
+        }
+        int curIncLen = 1;
+        int curDecLen = 1;
+
+        if (cur.val == parentVal + 1) {
+            curIncLen = incLen + 1;
+        } else if (cur.val == parentVal - 1) {
+            curDecLen = decLen + 1;
+        }
+
+        globalInc =Math.max(globalInc, curIncLen);
+        globalDec = Math.max(globalDec, curDecLen);
+        core(cur.left, cur.val, curIncLen, curDecLen);
+        core(cur.right, cur.val, curIncLen, curDecLen);
+    }
+
+    /*
+    https://www.lintcode.com/problem/binary-tree-path-sum/description
+    Binary Tree Path Sum
+
+    Given a binary tree, find all paths that sum of the nodes in the path
+    equals to a given number target.
+    A valid path is from root node to any of the leaf nodes.
+     */
+
+    public List<List<Integer>> binaryTreePathSum(TreeNode root, int target) {
+        // write your code here
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) {
+            return ret;
+        }
+
+        List<Integer> list = new ArrayList<>();
+        core(root, target, 0, list, ret);
+        return ret;
+    }
+
+    private void core(TreeNode cur, int target, int sumSoFar, List<Integer> list, List<List<Integer>> ret) {
+        if (cur == null) {
+            return;
+        }
+        list.add(cur.val);
+        if (cur.left == null && cur.right == null) {
+            if (sumSoFar + cur.val == target) {
+                ret.add(new ArrayList<Integer>(list));
+            }
+            list.remove(list.size() - 1);
+            return;
+        }
+        core(cur.left, target, sumSoFar + cur.val, list, ret);
+        core(cur.right, target, sumSoFar + cur.val, list, ret);
+
+        list.remove(list.size() - 1);
+    }
+
+    /*REDO
+
+    https://www.lintcode.com/problem/binary-tree-path-sum-ii/description
+    Binary Tree Path Sum II
+
+    Your are given a binary tree in which each node contains a value.
+    Design an algorithm to get all paths which sum to a given value.
+    The path does not need to start or end at the root or a leaf,
+    but it must go in a straight line down.
+     */
+
+    public List<List<Integer>> binaryTreePathSum2(TreeNode root, int target) {
+
+        // write your code here
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) {
+            return ret;
+        }
+        Map<Integer, List<List<Integer>>> map = new HashMap<>();
+//        List<List<Integer>> l = new ArrayList<List<Integer>>();
+//        l.add(new ArrayList<Integer>());
+//        map.put(0, l);
+        core(root, target, map, ret);
+        map.entrySet().stream().map(x -> {
+           int kk = x.getKey();
+            List<List<Integer>> val = x.getValue();
+            System.out.println("KEY : " + kk);
+           return 0;
+        });
+        return map.containsKey(target) ? map.get(target) : new ArrayList<List<Integer>>();
+    }
+
+    private void core(TreeNode cur, int target, Map<Integer, List<List<Integer>>> map, List<List<Integer>> ret) {
+        if (cur == null) {
+            return;
+        }
+        if (!map.containsKey(cur.val)) {
+            map.put(cur.val, new ArrayList<List<Integer>>());
+        }
+        List<Integer> ll = new ArrayList<>();
+        ll.add(cur.val);
+        map.get(cur.val).add(ll);
+
+        for (Map.Entry<Integer, List<List<Integer>>> en : map.entrySet()) {
+            int k = en.getKey();
+            int newK = k + cur.val;
+            List<List<Integer>> list = en.getValue();
+            list.stream().map(it -> {
+                        List<Integer>  l = new ArrayList<Integer>(it);
+                        l.add(cur.val);
+                        if (!map.containsKey(newK)) {
+                            map.put(newK, new ArrayList<List<Integer>>());
+                        }
+                        map.get(newK).add(l);
+                        return l;
+                    });
+        }
+        core(cur.left, target, map, ret);
+        core(cur.right, target, map, ret);
+    }
+
+    /* TODO
+    http://www.lintcode.com/problem/binary-tree-path-sum-iii/
+    Binary Tree Path Sum III
+
+    Give a binary tree, and a target number,
+    find all path that the sum of nodes equal to target,
+    the path could be start and end at any node in the tree.
+     */
+
+
+    /*
+    http://www.lintcode.com/problem/validate-binary-search-tree/
+    Validate Binary Search Tree
+
+    Given a binary tree, determine if it is a valid binary search tree (BST).
+    Assume a BST is defined as follows:
+
+    The left subtree of a node contains only nodes with keys less than the node's key.
+    The right subtree of a node contains only nodes with keys greater than the node's key.
+    Both the left and right subtrees must also be binary search trees.
+    A single node tree is a BST
+     */
+
+    public boolean isValidBST(TreeNode root) {
+        // write your code here
+        if (root == null || (root.left == null && root.right == null)) {
+            return true;
+        }
+
+        return core(root).isBST;
+    }
+
+    private class RET {
+        int min;
+        int max;
+        boolean isBST;
+        public RET() {
+            this.min = Integer.MAX_VALUE;
+            this.max = Integer.MIN_VALUE;
+            this.isBST = true;
+        }
+    }
+
+    private RET core(TreeNode root) {
+        if (root == null) {
+            return new RET();
+        }
+        RET l = core(root.left);
+        RET r = core(root.right);
+
+        RET cur = new RET();
+        if (!l.isBST || !r.isBST) {
+            cur.isBST = false;
+            return cur;
+        }
+        if ((root.left != null && root.val <= l.max) || (root.right != null && root.val >= r.min)) {
+//            System.out.println("cur : " + root.val + " lMax : " + l.max + " rMin : " + r.min);
+            cur.isBST = false;
+            return cur;
+        }
+
+        cur.min = Math.min(root.val, Math.min(l.min, r.min));
+        cur.max = Math.max(root.val, Math.max(l.max, r.max));
+        cur.isBST = l.isBST && r.isBST;
+//        System.out.println("CUR : " + root.val + "  min : " + cur.min + " max : " + cur.max + " isBST : " + cur.isBST);
+        return cur;
+    }
+
+    public boolean isValidBST(TreeNode root) {
+        // write your code here
+        if (root == null || (root.left == null && root.right == null)) {
+            return true;
+        }
+        return core(root.left, Integer.MIN_VALUE, root.val) && core(root.right, root.val, Integer.MAX_VALUE);
+    }
+
+    //M2
+    private boolean core(TreeNode cur, int lBound, int rBound) {
+        if (cur == null) {
+            return true;
+        }
+
+        if ((cur.val != Integer.MIN_VALUE && cur.val <= lBound) || (cur.val != Integer.MAX_VALUE && cur.val >= rBound)) {
+            return false;
+        }
+        return core(cur.left, lBound, cur.val) && core(cur.right, cur.val, rBound);
+
+    }
+
+    /*
+    http://www.lintcode.com/problem/convert-binary-search-tree-to-do
+ubly-linked-list/
+
+    Convert Binary Search Tree to Doubly Linked List
+    Convert a binary search tree to doubly linked list with in-order traversal.
+     */
+//    * Definition for Doubly-ListNode.
+// * public class DoublyListNode {
+// *     int val;
+// *     DoublyListNode next, prev;
+// *     DoublyListNode(int val) {
+// *         this.val = val;
+// *         this.next = this.prev = null;
+// *     }
+// * } * Definition of TreeNode:
+//            * public class TreeNode {
+// *     public int val;
+// *     public TreeNode left, right;
+// *     public TreeNode(int val) {
+// *         this.val = val;
+// *         this.left = this.right = null;
+// *     }
+// * }
+
+    public DoublyListNode bstToDoublyList(TreeNode root) {
+        // write your code here
+        if (root == null) {
+            return null;
+        }
+        DoublyListNode y = core(root).head;
+        DoublyListNode x = y;
+
+        while (x.next != null) {
+            System.out.println(x.next.val + "-->");
+            x = x.next;
+        }
+        return y;
+    }
+    private class RET {
+        DoublyListNode head;
+        DoublyListNode tail;
+        int val;
+        public RET(DoublyListNode head, DoublyListNode tail, int val) {
+            this.head = head;
+            this.tail = tail;
+            this.val = val;
+        }
+        public RET(int val) {
+            this.val = val;
+            this.head = null;
+            this.tail = null;
+        }
+    }
+
+    private RET core(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        if (root.left == null && root.right == null) {
+            DoublyListNode ln = new DoublyListNode(root.val);
+            return new RET(ln, ln, root.val);
+        }
+        RET l = core(root.left);
+        RET r = core(root.right);
+        RET cur = new RET(root.val);
+        DoublyListNode node = new DoublyListNode(root.val);
+        if (l != null) {
+            cur.head = l.head;
+            l.tail.next = node;
+            node.prev = l.tail;
+
+            cur.head = l.head;
+            cur.tail = node;
+            if (r != null) {
+                node.next = r.head;
+                r.head.prev = node;
+
+                cur.tail = r.tail;
+            }
+        } else {//l == null
+            cur.head = node;
+            if (r != null) {
+                node.next = r.head;
+                r.head.prev = node;
+
+                cur.tail = r.tail;
+            } else {
+                cur.tail = node;
+            }
+        }
+        System.out.println("cur : " + cur.val + " head : " + cur.head.val + " tail : " + cur.tail.val);
+        return cur;
+    }
+
+
+    /*
+    http://www.lintcode.com/problem/binary-search-tree-iterator
+    Binary Search Tree Iterator
+
+    Design an iterator over a binary search tree with the following rules:
+    Elements are visited in ascending order (i.e. an in-order traversal)
+    next() and hasNext() queries run in O(1) time in average.
+     */
+    /**
+     * Definition of TreeNode:
+     * public class TreeNode {
+     *     public int val;
+     *     public TreeNode left, right;
+     *     public TreeNode(int val) {
+     *         this.val = val;
+     *         this.left = this.right = null;
+     *     }
+     * }
+     * Example of iterate a tree:
+     * BSTIterator iterator = new BSTIterator(root);
+     * while (iterator.hasNext()) {
+     *    TreeNode node = iterator.next();
+     *    do something for node
+     * }
+     */
+    //TODO: preorder and postorder iterator
+
+    public class BSTIterator {
+        TreeNode cur;
+        Stack<TreeNode> stk;
+
+        /*
+        * @param root: The root of binary tree.
+        */public BSTIterator(TreeNode root) {
+            // do intialization if necessary
+            stk = new Stack<>();
+            cur = root;
+            while (cur != null) {
+                stk.push(cur);
+                cur = cur.left;
+            }
+        }
+
+        /*
+         * @return: True if there has next node, or false
+         */
+        public boolean hasNext() {
+            // write your code here
+            return !stk.isEmpty();
+        }
+
+        /*
+         * @return: return next node
+         */
+        public TreeNode next() {
+            // write your code here
+            if (!hasNext()) {
+                return null;
+            }
+            TreeNode ret =  stk.pop();
+            TreeNode cur = ret.right;
+            while (cur != null) {
+                stk.push(cur);
+                cur = cur.left;
+            }
+            return ret;
+        }
+    }
+
+    /*
+    http://www.lintcode.com/problem/inorder-successor-in-binary-search-tree/
+    Inorder Successor in BST
+    Given a binary search tree (See Definition) and a node in it,
+    find the in-order successor of that node in the BST.
+
+    If the given node has no in-order successor in the tree, return null.
+     */
+
+    /*
+     * @param root: The root of the BST.
+     * @param p: You need find the successor node of p.
+     * @return: Successor of p.
+     */
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        // write your code here
+        if (root == null ) {
+            return root;
+        }
+        TreeNode candi = null;
+        TreeNode cur = root;
+        boolean isFound = false;
+        while (cur != null) {
+            if (cur.val == p.val) {
+                isFound = true;
+                if (cur.right != null) {
+                    TreeNode ret = cur.right;
+                    while (ret.left != null) {
+                        ret = ret.left;
+                    }
+                    return ret;
+                } else {
+                    return candi;
+                }
+            } else if (p.val < cur.val) {
+                candi = cur;
+                cur = cur.left;
+            } else { // p.val > cur.val
+                cur = cur.right;
+            }
+        }
+        return isFound ? candi : null;
+
+    }
+
+    /*
+    Insert Node in a Binary Search Tree
+    Given a binary search tree and a new tree node,
+    insert the node into the tree.
+    You should keep the tree still be a valid binary search tree.
+     */
+
+    public TreeNode insertNode(TreeNode root, TreeNode node) {
+        // write your code here
+        if (node == null) {
+            return root;
+        }
+        if (root == null) {
+            return node;
+        }
+        TreeNode cur = root;
+        while (cur != null) {
+//            System.out.println("cur = " + cur.val + " cur_left = " + cur.left.val + " cur_right = " + cur.right.val);
+
+            if (cur.left != null && cur.right != null) {
+                System.out.println("1");
+                if (node.val < cur.val) {
+                    cur = cur.left;
+                } else if (node.val > cur.val) {
+                    cur = cur.right;
+                }
+            } else if (cur.left == null && cur.right == null) {
+                System.out.println("2");
+                if (node.val < cur.val) {
+                    cur.left = node;2
+                }
+                if (node.val > cur.val) {
+                    cur.right = node;
+                }
+                cur = null;
+            }else if (cur.left == null) {
+                System.out.println("3");
+                if (node.val < cur.val) {
+                    cur.left = node;
+//                    cur = null;
+                    break;
+                } else {
+                    cur = cur.right;
+                }
+            } else if (cur.right == null) {
+                System.out.println("4");
+                if (node.val > cur.val) {
+                    cur.right = node;
+//                    cur = null;
+                    break;
+                } else {
+                    cur = cur.left;
+                }
+            }
+        }
+        return root;
+    }
+    /*
+    http://www.lintcode.com/problem/remove-node-in-binary-search-tree/
+    Remove Node in Binary Search Tree
+
+    Given a root of Binary Search Tree with unique value for each node.
+    Remove the node with given value.
+    If there is no such a node with given value in the binary search tree,
+    do nothing. You should keep the tree still a binary search tree after removal.
+     */
+
+    public TreeNode removeNode(TreeNode root, int value) {
+        // write your code here
+
+    }
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 chap1
@@ -491,21 +1173,24 @@ http://www.jiuzhang.com/solutions/convert-binary-search-tree-to-d oubly-linked-l
 
    Related Questions
 
-    • Binary Search Tree Iterator
+• Binary Search Tree Iterator
 • http://www.lintcode.com/problem/binary-search-tree-iterator
-• http://www.jiuzhang.com/solutions/binary-search-tree-iterator • In-order Successor in Binary Search Tree
-• http://www.lintcode.com/problem/inorder-successor-in-binary-search-tree/ • http://www.jiuzhang.com/solutions/inorder-successor-in-binary-search-tree/ • Search Range in Binary Search Tree
+• http://www.jiuzhang.com/solutions/binary-search-tree-iterator
+
+• In-order Successor in Binary Search Tree
+• http://www.lintcode.com/problem/inorder-successor-in-binary-search-tree/
+• http://www.jiuzhang.com/solutions/inorder-successor-in-binary-search-tree/
+
+• Search Range in Binary Search Tree
 • http://www.lintcode.com/problem/search-range-in-binary-search-tree/
+
 • Insert Node in a Binary Search Tree
 • http://www.lintcode.com/problem/insert-node-in-a-binary-search-tree/
+
 • Remove Node in a Binary Search Tree
 • http://www.lintcode.com/problem/remove-node-in-binary-search-tree/
-• http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete.html 禁止录像与传播录像，否则将追究法律责任和经济赔偿
+• http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete.html
 
  点题时间 http://www.jiuzhang.com/qa/983/
-
-
-
-
 
  */

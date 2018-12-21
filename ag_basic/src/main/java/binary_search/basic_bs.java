@@ -872,4 +872,8 @@ public class basic_bs {
         }
         return false;
     }
+
+//    public static void main(String[] args) {
+//        System.out.println("TEST DOUBLE MAX: " + Double.MAX_VALUE);
+//    }
 }
