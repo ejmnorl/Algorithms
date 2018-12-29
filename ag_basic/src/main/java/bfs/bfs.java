@@ -209,7 +209,7 @@ public class bfs {
         return ret;
     }
 
-    /*TODO:
+    /*TODO:?????
     http://www.lintcode.com/problem/graph-valid-tree/
     Graph Valid Tree
     Given n nodes labeled from 0 to n - 1 and a list of undirected edges
@@ -504,17 +504,618 @@ public class bfs {
         System.out.println();
     }
 
+    /*
+    https://www.lintcode.com/problem/course-schedule-ii/description
+    Course Schedule II
+    There are a total of n courses you have to take, labeled from 0 to n - 1.
+    Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+    Given the total number of courses and a list of prerequisite pairs, return the ordering of courses you should take to finish all courses.
+    There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+     */
+
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        // write your code here
+
+
+    }
+
+    /* REDO !!!
+    Sequence Reconstruction
+    Check whether the original sequence org can be uniquely reconstructed from the sequences in seqs.
+    The org sequence is a permutation of the integers from 1 to n, with 1 ≤ n ≤ 10^4.
+    Reconstruction means building a shortest common supersequence of the sequences in seqs
+    (i.e., a shortest sequence so that all sequences in seqs are subsequences of it).
+    Determine whether there is only one sequence that can be reconstructed from seqs and it is the org sequence.
+
+    Example
+    Given org = [1,2,3], seqs = [[1,2],[1,3]]
+    Return false
+    Explanation:
+            [1,2,3] is not the only one sequence that can be reconstructed, because [1,3,2] is also a valid sequence that can be reconstructed.
+
+    Given org = [1,2,3], seqs = [[1,2]]
+    Return false
+    Explanation:
+    The reconstructed sequence can only be [1,2].
+
+    Given org = [1,2,3], seqs = [[1,2],[1,3],[2,3]]
+    Return true
+    Explanation:
+    The sequences [1,2], [1,3], and [2,3] can uniquely reconstruct the original sequence [1,2,3].
+
+    Given org = [4,1,5,2,6,3], seqs = [[5,2,6,3],[4,1,5,2]]
+    Return true
+    */
+
+    public boolean sequenceReconstruction(int[] org, int[][] seqs) {
+        // write your code here
+        if (seqs == null || seqs.length == 0 || seqs[0].length == 0) {
+            if (org == null || org.length == 0) {
+                return true;
+            }
+            return false;
+        }
+        if (org == null || org.length == 0) {
+            return false;
+        }
+
+        Map<Integer, List<Integer>> adj = new HashMap<>();
+        Set<Integer> nodes = new HashSet<>();
+        Map<Integer, Integer> indegrees = new HashMap<>();
+
+        List<Integer> zero = new ArrayList<>();
+
+
+        Queue<Integer> q = new LinkedList<>();
+        for (Integer  i : nodes) {
+            if (!indegrees.containsKey(i)) {
+                zero.add(i);
+                if (zero.size() > 1) {
+                    return false;
+                }
+            }
+        }
+
+        if (zero.size() != 1) {
+            return false;
+        }
+        Set<Integer> visited = new HashSet<>();
+        Integer start = zero.remove(0);
+        visited.add(start);
+        q.offer(start);
+
+        List<Integer> list = new ArrayList<>();
+        list.add(start);
+
+
+        while (!q.isEmpty()) {
+                Integer cur = q.poll();
+                List<Integer> neighbors = adj.get(cur);
+                if (neighbors != null) {
+                    for (Integer neighbor : neighbors) {
+                        indegrees.put(neighbor, indegrees.get(neighbor) - 1);
+                        if (indegrees.get(neighbor) == 0) {
+                            zero.add(neighbor);
+                        }
+                        if (zero.size() > 1) {
+                            return false;
+                        }
+
+                        if (!visited.contains(neighbor)) {
+                            visited.add(neighbor);
+                            q.offer(neighbor);
+                        }
+                    }
+                }
+
+                if (zero.size() > 1) {
+                    return false;
+                }
+                if (zero.size() == 0) {
+                    if (!q.isEmpty()) {
+                        return false;
+                    }
+                }
+                list.add(zero.remove(0));
+        }
+        return isEqual(list, org);
+    }
+
+    private void generateAdj(int[][] seqs, Map<Integer, List<Integer>> adj, Set<Integer> nodes, Map<Integer, Integer> indegrees) {
+        for (int i = 0; i < seqs.length; i++) {
+            int from = seqs[i][0];
+            nodes.add(from);
+            for (int j = 1; j < seqs[i].length; j++) {
+                from = seqs[i][j - 1];
+                int to = seqs[i][j];
+                nodes.add(to);
+                if (indegress.containsKey(to)) {
+                    indegrees.put(to, 1);
+                } else {
+                    indegrees.put(to, indegress.get(to) + 1);
+                }
+
+                if (!adj.containksKey(from)) {
+                    adj.put(from, new ArrayList<>());
+                }
+                adj.get(from).add(to);
+            }
+        }
+    }
+
+    private boolean isEqual(List<Integer> list, int[] seqs) {
+        if (seqs.length != list.size()) {
+            return false;
+        }
+        for (int i = 0; i < seqs.length; i++) {
+            if (list.get(i) != seqs[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /* TODO: M2 union find
+    https://www.lintcode.com/problem/number-of-islands/description
+    Number of Islands
+    Given a boolean 2D matrix, 0 is represented as the sea,
+    1 is represented as the island.
+    If two 1 is adjacent, we consider them in the same island. We only consider up/down/left/right adjacent.
+    Find the number of islands.
+     */
+
+    public int numIslands(boolean[][] grid) {
+        // write your code here
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        int m = grid.length, n = grid[0].length;
+        Set<Integer>  visited = new HashSet<>();
+
+        int cnt = 0;
+        int[][] go = {{0,1}, {0,-1}, {1,0}, {-1, 0}};
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                int val = i * m + j;
+                if (grid[i][j] && !visited.contains(val)) {
+                    cnt++;
+                    q.offer(val);
+                    visited.add(val);
+                    while (!q.isEmpty()) {
+                        int cur = q.poll();
+                        int r = cur / m;
+                        int c = cur % m;
+                        for (int k = 0; k < 4; k++) {
+                            int newR = r + go[k][0];
+                            int newC = c + go[k][1];
+                            int newVal = newR * m + newC;
+                            if (inBound(m, n, newR, newC) && grid[newR][newC] && !visited.contains(newVal))  {
+                                visited.add(newVal);
+                                q.offer(newVal);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cnt;
+    }
+
+    private boolean inBound(int m, int n, int newR, int newC) {
+        if (newR < 0 || newR >= m || newC < 0 || newC >= n) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+    http://www.lintcode.com/problem/zombie-in-matrix/
+    Zombie in Matrix
+    Given a 2D grid, each cell is either a wall 2, a zombie 1 or people 0 (the number zero, one, two).
+    Zombies can turn the nearest people(up/down/left/right) into zombies every day,
+    but can not through wall. How long will it take to turn all people into zombies?
+    Return -1 if can not turn all people into zombies.
+    Example
+    Given a matrix:
+
+    0 1 2 0 0
+    1 0 0 2 1
+    0 1 0 0 0
+
+    return 2
+     */
+
+    public int zombie(int[][] grid) {
+        // write your code here
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        Queue<Integer> q = new LinkedList<>();
+        int m = grid.length, n = grid[0].length;
+        boolean[][] visited = new boolean[m][n];
+        int[][] shift = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 1) {
+                    q.offer(i * m + j);
+                    System.out.println("i = " + i + " j = " + j);
+                }
+            }
+        }
+        int cnt = 0;
+
+
+        while (!q.isEmpty()) {
+            int size = q.size();
+            cnt++;
+            for (int i = 0; i < size; i++) {
+                Integer cur = q.poll();
+
+                int r = cur / m;
+                int c = cur % m;
+                for (int j = 0; j < 4; j++) {
+                    int newR = r + shift[j][0];
+                    int newC = c + shift[j][1];
+                    if (inBound(m, n, newR, newC) && grid[newR][newC] == 0) {
+                        grid[newR][newC] = 1;
+                        q.offer(newR * m + newC);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                System.out.print(grid[i][j] + " , ");
+                if (grid[i][j] == 0) {
+                    return -1;
+                }
+            }
+            System.out.println();
+        }
+        return cnt - 1;
+    }
+
+
+    private boolean inBound(int m, int n, int newR, int newC) {
+        if (newR < 0 || newR >= m || newC < 0 || newC >= n) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+    http://www.lintcode.com/problem/knight-shortest-path/
+    Knight Shortest Path
+
+    Given a knight in a chessboard (a binary matrix with 0 as empty and 1 as barrier) with a source position,
+    find the shortest path to a destination position, return the length of the route.
+    Return -1 if knight can not reached.
+    Example
+
+    [[0,0,0],
+     [0,0,0],
+     [0,0,0]]
+    source = [2, 0] destination = [2, 2] return 2
+
+    [[0,1,0],
+     [0,0,0],
+     [0,0,0]]
+    source = [2, 0] destination = [2, 2] return 6
+
+    [[0,1,0],
+     [0,0,1],
+     [0,0,0]]
+    source = [2, 0] destination = [2, 2] return -1
+
+    Clarification
+    If the knight is at (x, y), he can get to the following positions in one step:
+    (x + 1, y + 2)
+    (x + 1, y - 2)
+    (x - 1, y + 2)
+    (x - 1, y - 2)
+    (x + 2, y + 1)
+    (x + 2, y - 1)
+    (x - 2, y + 1)
+    (x - 2, y - 1)
+
+    Notice
+    source and destination must be empty.
+    Knight can not enter the barrier.
+     */
+
+    public int shortestPath(boolean[][] grid, Point source, Point destination) {
+        // write your code here
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return -1;
+        }
+        if (grid[source.x][source.y] || grid[destination.x][destination.y]) {
+            return -1;
+        }
+        if(source.x == destination.x && source.y == destination.y) {
+            return 0;
+        }
+
+        int[][] shift = {{1,2}, {1, -2}, {-1, 2}, {-1, -2}, {2,1}, {2,-1}, {-2,1}, {-2,-1}};
+
+        Queue<Integer> q = new LinkedList<>();
+        int  m = grid.length, n = grid[0].length;
+        int start = source.x * n + source.y;
+        q.offer(start);
+        int step = 0;
+
+        while (!q.isEmpty()) {
+            int size = q.size();
+            step++;
+            for (int i = 0; i < size; i++) {
+                Integer cur = q.poll();
+                int r = cur / n;
+                int c = cur % n;
+                for (int j = 0; j < shift.length; j++) {
+                    int newR = r + shift[j][0];
+                    int newC = c + shift[j][1];
+                    if (inBound(m,n,newR,newC) && !grid[newR][newC]) {
+                        if (newR == destination.x && newC == destination.y) {
+                            return step;
+                        }
+                        grid[newR][newC] = true;
+                        q.offer(newR * n + newC);
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean inBound(int m, int n, int newR, int newC) {
+        if (newR < 0 || newR >= m || newC < 0 || newC >= n) {
+            return false;
+        }
+        return true;
+    }
+
+    /* todo: ???????
+
+    http://www.lintcode.com/problem/build-post-office-ii/
+    Build Post Office II
+
+    Given a 2D grid, each cell is either a wall 2,
+    an house 1 or empty 0 (the number zero, one, two),
+    find a place to build a post office so that the sum of the distance from the post office to all the houses is smallest.
+
+    Return the smallest sum of distance. Return -1 if it is not possible.
+    Example
+    Given a grid:
+    0 1 0 0 0
+    1 0 0 2 1
+    0 1 0 0 0
+
+    return 8, You can build at (1,1). (Placing a post office at (1,1), the distance that post office to all the house sum is smallest.)
+    Challenge
+
+    Solve this problem within O(n^3) time.
+    Notice
+
+        You cannot pass through wall and house, but can pass through empty.
+        You only build post office on an empty.
+     */
+
+    public int shortestDistance(int[][] grid) {
+        // write your code here
+
+
+
+    }
+
+    /*
+    http://www.lintcode.com/problem/connected-component-in-undirected-graph/
+    Connected Component in Undirected Graph
+
+    Find the number connected component in the undirected graph.
+    Each node in the graph contains a label and a list of its neighbors.
+    (a connected component (or just component) of an undirected graph is a subgraph
+    in which any two vertices are connected to each other by paths,
+    and which is connected to no additional vertices in the supergraph.)
+    Example
+
+    Given graph:
+
+    A------B  C
+     \     |  |
+      \    |  |
+       \   |  |
+        \  |  |
+          D   E
+
+    Return {A,B,D}, {C,E}. Since there are two connected component which is {A,B,D}, {C,E}
+     */
+
+    public List<List<Integer>> connectedSet(List<UndirectedGraphNode> nodes) {
+        // write your code here
+        List<List<Integer>> ret = new ArrayList<>();
+        if (nodes == null || nodes.size() == 0) {
+            return ret;
+        }
+        Set<UndirectedGraphNode> visited = new HashSet<>();
+        for (UndirectedGraphNode node : nodes) {
+            if (!visited.contains(node)) {
+                List<Integer> path = new ArrayList<>();
+                core(path, visited, node);
+                Collections.sort(path);
+                ret.add(path);
+            }
+        }
+        return ret;
+    }
+
+    private void core(List<Integer> path, Set<UndirectedGraphNode> visited, UndirectedGraphNode cur) {
+        visited.add(cur);
+        path.add(cur.label);
+
+        ArrayList<UndirectedGraphNode> neighbors = cur.neighbors;
+        if (neighbors != null && neighbors.size() > 0) {
+            for (UndirectedGraphNode neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    core(path, visited, neighbor);
+                }
+            }
+        }
+    }
+
+    /*
+    http://www.lintcode.com/problem/smallest-rectangle-enclosing-black-pixels/
+    Smallest Rectangle Enclosing Black Pixels
+
+    An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel.
+    The black pixels are connected, i.e., there is only one black region.
+    Pixels are connected horizontally and vertically.
+    Given the location (x, y) of one of the black pixels,
+    return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
+    Example
+
+    For example, given the following image:
+    [
+      "0010",
+      "0110",
+      "0100"
+    ]
+
+    and x = 0, y = 2,
+    Return 6.
+
+     */
+
+    public int minArea(char[][] image, int x, int y) {
+        // write your code here
+        if (image == null || image.length == 0 || image[0].length == 0) {
+            return 0;
+        }
+        int m = image.length, n = image[0].length;
+        int up = x;
+        int down = x;
+        int left = y;
+        int right = ;y
+        int[][] shift = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+        boolean[][] visited = new boolean[m][n];
+
+        Queue<Integer> q = new LinkedList<>();
+        q.offer(x * n + y);
+        visited[x][y] = true;
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            int r = cur / n;
+            int c = cur % n;
+            for (int i = 0; i < 4; i++) {
+                int newR = r + shift[i][0];
+                int newC = c + shift[i][1];
+                if (inBound(m,n,newR,newC) && !visited[newR][newC] && images[newR][newC] == '1') {
+                    up = Math.min(up, newR);
+                    down = Math.max(down, newR);
+                    left = Math.min(left, newC);
+                    right = Math.max(right, newC);
+                    visited[newR][newC] = true;
+                    q.offer(newR * n + newC);
+                }
+            }
+        }
+        return (right - left + 1) * (down - up + 1);
+    }
+
+
+    private boolean inBound(int m, int n, int newR, int newC) {
+        if (newR < 0 || newR >= m || newC < 0 || newC >= n) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+    http://www.lintcode.com/problem/word-ladder/
+    Word Ladder
+
+    Given two words (start and end), and a dictionary,
+    find the length of shortest transformation sequence from start to end, such that:
+
+    Only one letter can be changed at a time
+    Each intermediate word must exist in the dictionary
+
+    Example
+    Given:
+    start = "hit"
+    end = "cog"
+    dict = ["hot","dot","dog","lot","log"]
+
+    As one shortest transformation is "hit" -> "hot" -> "dot" -> "dog" -> "cog",
+    return its length 5.
+    Notice
+
+        Return 0 if there is no such transformation sequence.
+        All words have the same length.
+        All words contain only lowercase alphabetic characters.
+     */
+    public int ladderLength(String start, String end, Set<String> dict) {
+        // write your code here
+        if (start == null || start.length() == 0 || end == null || end.length() == 0) {
+            return 0;
+        }
+        if (start.equals(end)) {
+            return 1;
+        }
+        Queue<String> q = new LinkedList<>();
+        q.offer(start);
+
+        if (dict.contains(start)) {
+            dict.remove(start);
+        }
+        int steps = 1;
+
+        while (!q.isEmpty()) {
+            int size = q.size();
+            steps++;
+            for (int i = 0; i < size; i++) {
+                String cur = q.poll();
+                List<String> neighbors = getNeighbors(cur, dict, end);
+                for (String neighbor : neighbors) {
+                    if (neighbor.equals(end)) {
+                        return steps;
+                    }
+                    q.offer(neighbor);
+                }
+            }
+        }
+        return 0;
+    }
+
+    private List<String> getNeighbors(String cur, Set<String> dict, String end) {
+        List<String> ret = new ArrayList<>();
+        char[] chars = cur.toCharArray();
+        for (int i = 0; i < cur.length(); i++) {
+            char original = chars[i];
+            for (int j = 0; j < 26; j++) {
+                char x = (char) ('a' + j);
+                chars[i] = x;
+                String newS = new String(chars);
+                if (dict.contains(newS)) {
+                    dict.remove(newS);
+                    ret.add(newS);
+                }
+                if (newS.equals(end)) {
+                    ret.add(newS);
+                }
+                chars[i] = original;
+            }
+        }
+        return ret;
+    }
 }
 
 
 
-Input
 
-        {0,1,2,3,4#1,3,4#2,1,4#3,4#4}
 
-        Output
 
-        [0,2,1,3,4,4,4,4]
 
 
 
@@ -589,9 +1190,11 @@ http://www.jiuzhang.com/solutions/build-post-office-ii/
 
 相关问题 图的遍历(由点及面)
 • 无向图联通块
-• http://www.lintcode.com/problem/connected-component-in-undirected-graph/ • 覆盖黑点的最小矩阵(BFS无法AC但是可以作为BFS的练习题)
+• http://www.lintcode.com/problem/connected-component-in-undirected-graph/
+• 覆盖黑点的最小矩阵(BFS无法AC但是可以作为BFS的练习题)
 • http://www.lintcode.com/problem/smallest-rectangle-enclosing-black-pixels/
-简单图最短路径 • 单词阶梯
+简单图最短路径
+• 单词阶梯
 • http://www.lintcode.com/problem/word-ladder/
  */
 
