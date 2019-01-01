@@ -279,7 +279,7 @@ public class bfs {
         return ret;
     }
 
-    /*
+    /*redo:  todo: sepearate copy nodes and copy edges
     http://www.lintcode.com/problem/clone-graph/
     Clone Graph
     Clone an undirected graph. Each node in the graph contains a label and a list of its neighbors.
