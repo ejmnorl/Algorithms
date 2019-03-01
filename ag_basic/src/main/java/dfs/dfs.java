@@ -454,9 +454,62 @@ public class dfs {
 
     public int ladderLength(String start, String end, Set<String> dict) {
         // write your code here
+        if (dict == null || dict.size() == 0) {
+            return 0;
+        }
+        if (start.equals(end)) {
+            return 1;
+        }
+        Queue<String> q = new LinkedList<>();
+        if (!dict.contains(end)) {
+            dict.add(end);
+        }
+        if (dict.contains(start)) {
+            dict.remove(start);
+        }
 
+        int len = 1;
+        q.offer(start);
+        while (!q.isEmpty()) {
+            int size = q.size();
+            len++;
+            for (int i = 0; i < size; i++) {
+                String cur = q.poll();
+                for (String neighbor : getNeighbors(dict, cur)) {
+                    // System.out.println("neighbor = " + neighbor);
+                    if (neighbor.equals(end)) {
+                        return len;
+                    }
+                    q.offer(neighbor);
 
+                }
+            }
+        }
+        return -1;
+    }
 
+    private List<String> getNeighbors(Set<String> dict, String word) {
+        List<String> ret = new ArrayList<>();
+        char[] chars = word.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+
+            for (char x = 'a'; x <= 'z'; x++) {
+
+                char ori = chars[i];
+                if (x == ori) {
+                    continue;
+                }
+                chars[i] = x;
+                String newW = new String(chars);
+                // System.out.println("newW = " + newW);
+                if (dict.contains(newW)) {
+                    ret.add(newW);
+                    dict.remove(newW);
+                }
+                chars[i] = ori;
+            }
+        }
+        return ret;
     }
 
     /*
@@ -482,8 +535,6 @@ public class dfs {
     All words have the same length.
     All words contain only lowercase alphabetic characters.
      */
-
-
     public List<List<String>> findLadders(String start, String end, Set<String> dict) {
         // write your code here
         List<List<String>> ret = new ArrayList<>();
@@ -491,22 +542,141 @@ public class dfs {
             return ret;
         }
         if (start.equals(end)) {
-            if (dict.contains(start)) {
-                List<String> l = new ArrayList<>();
-                l.add(start);
-                ret.add(l);
-            }
-
+            List<String> list = new ArrayList<>();
+            list.add(start);
+            ret.add(list);
+            return ret;
         }
-        Set<String> visited = new HashSet<>();
-        Map<String, List<String>> adj = new HashMap<>();
 
-        dict.add(end);
+        if (!dict.contains(end)) {
+            dict.add(end);
+        }
+        if (dict.contains(start)) {
+            dict.remove(start);
+        }
+
+        Map<String, Set<String>> adj = new HashMap<>();
+        buildAdj(start, end, dict, adj);
+        for (String x : adj.keySet()) {
+            System.out.println("22 " + adj.get(x));
+        }
 
 
+
+        List<String> curPath = new ArrayList<>();
+        buildRet(start, end, adj, ret, curPath);
+        return ret;
+
+
+
+        // return buildRet(start, end, adj).get(start);
     }
 
-    private void buildAdj(String start, String end, Set<String> dict, Set<String> visited, Map<String, List<String>> adj) {
-
+    private void buildAdj(String start, String end, Set<String> dict,  Map<String, Set<String>> adj) {
+        Queue<String> q = new LinkedList<>();
+        q.offer(start);
+        while(!q.isEmpty()) {
+            int size = q.size();
+            Set<String> in = new HashSet<>();
+            for (int i = 0; i < size; i++) {
+                String cur = q.poll();
+                if (cur.equals(end)) {
+                    return;
+                }
+                for (String neighbor : getNeighbors(cur, dict)) {
+                    // System.out.println("neighbor = " + neighbor);
+                    if (!adj.containsKey(neighbor)) {
+                        adj.put(neighbor, new HashSet<>());
+                    }
+                    adj.get(neighbor).add(cur);
+                    // System.out.println("!!! NEIGHBOR = " + neighbor);
+                    if (!in.contains(neighbor)) {
+                        in.add(neighbor);
+                        q.offer(neighbor);
+                    }
+                }
+            }
+            for(String x : in) {
+                dict.remove(x);
+            }
+        }
     }
+
+
+    // private void buildRet(String start, String cur, Map<String, Set<String>> adj, Map<String, List<List<String>>> map) { //dfs wrong version
+    //     if (!map.containsKey(cur)) {
+    //         List<String> tmp = new ArrayList<>();
+    //         tmp.add(cur);
+    //         List<List<String>> ll = new ArrayList<>();
+    //         ll.add(tmp);
+    //         map.put(cur, ll);
+    //     }
+    //     if (start.equals(cur)) {
+    //         return;
+    //     }
+    //     for (String neighbor : adj.get(cur)) {
+    //         System.out.println("ABC: cur = " + cur);
+    //         for (List<String> path : map.get(cur)) {
+    //             List<String> newL = new ArrayList<>(path);
+    //             newL.add(0, neighbor);
+    //             if (!map.containsKey(neighbor)) {
+    //                 map.put(neighbor, new ArrayList<>());
+    //             }
+    //             map.get(neighbor).add(newL);
+    //             System.out.println("ABCABC: cur lead to new path: " + newL);
+    //         }
+
+    //         // System.out.println("ABCABCABC: neighbor all path: " );
+    //         for (List<String> xx : map.get(neighbor)) {
+    //             System.out.println("ABCABCABC: " + xx);
+    //         }
+    //         buildRet(start, neighbor, adj, map);
+    //     }
+    // }
+
+
+    private void buildRet(String start, String cur, Map<String, Set<String>> adj, List<List<String>> ret, List<String> curPath) { //dfs
+
+        curPath.add(0, cur);
+        System.out.println("curPath = " + curPath);
+        if (start.equals(cur)) {
+
+            ret.add(new ArrayList<>(curPath));
+            curPath.remove(0);
+            System.out.println("HIT: curPath = " + curPath);
+            return;
+        }
+        for (String neighbor : adj.get(cur)) {
+
+            buildRet(start, neighbor, adj, ret, curPath);
+        }
+        curPath.remove(0);
+    }
+
+    private List<String> getNeighbors(String word, Set<String> dict) {
+        List<String> ret = new ArrayList<>();
+        char[] chars = word.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+
+            for (char x = 'a'; x <= 'z'; x++) {
+
+                char ori = chars[i];
+                if (x == ori) {
+                    continue;
+                }
+                chars[i] = x;
+                String newW = new String(chars);
+                // System.out.println("newW = " + newW);
+                if (dict.contains(newW)) {
+                    ret.add(newW);
+
+                }
+                chars[i] = ori;
+            }
+        }
+        return ret;
+    }
+
+
+
 }
